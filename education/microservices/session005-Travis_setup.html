@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8">
+    <title>Education</title>
+    <meta name="description" content="">
+    <!-- Mobile Specific Meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- <link rel="shortcut icon" href="img/favicon.png"> -->
+
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700' rel='stylesheet'>
+
+    <!-- Syntax Highlighter -->
+    <link rel="stylesheet" type="text/css" href="syntax-highlighter/styles/shCore.css" media="all">
+    <link rel="stylesheet" type="text/css" href="syntax-highlighter/styles/shThemeDefault.css" media="all">
+
+    <!-- Font Awesome CSS-->
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <!-- Normalize/Reset CSS-->
+    <link rel="stylesheet" href="css/normalize.min.css">
+    <!-- Main CSS-->
+    <link rel="stylesheet" href="css/main.css">
+
+</head>
+
+<body id="welcome">
+
+    <aside class="left-sidebar">
+        <div class="logo">
+            <a href="#welcome">
+                <img src="img/logo.png" alt="">
+            </a>
+        </div>
+        <nav class="left-nav">
+            <ul id="nav">
+                <li class="current">
+                    <a href="#intro">Session Summary</a>
+                </li>
+                <li>
+                    <a href="#lab001">Lab Setup</a>
+                </li>
+                <li>
+                    <a href="#lab002">Create an Account</a>
+                </li>
+                <li>
+                    <a href="#lab003">Configure application manifest </a>
+                </li>
+                <li>
+                    <a href="#lab004">Configure your Environment Variables</a>
+                </li>
+                <li>
+                    <a href="#lab005">View deployed application</a>
+                </li>
+                <li>
+                    <a href="#extras">Extras</a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <div id="main-wrapper">
+        <div class="main-content">
+            <section id="welcome">
+                <div class="content-header">
+                        <h1>Deployment Pipelines</h1>
+                </div>
+                <div class="features">
+                </div>
+            </section>
+
+            <section id="intro">
+                <h2 class="title">Session Summary</h2>
+                <div class="section-content">
+                    <ol>
+                        <li>
+                                In this lab we will be creating a pipeline to deploy an application to Cloud Foundry. The lab will lead you through the anatomy of how Travis CI solves this problem. You can apply the same pipeline structure to other CI tools like Concourse or Jenkins.
+
+For the purpose of this lab there are two environments:
+
+Local environment (i.e. your workstation)
+Review environment
+This is a small but realistic example of a deployment pipeline. In your actual experience there will likely be more environments such as a QA, staging, pre-production, etc.
+
+When code is pushed to GitHub and tests pass, Travis CI will deploy to the review environment automatically. The application can be observed running on Cloud Foundry before deciding to deploy to production.
+                           
+                        </li>
+                       
+                    </ol>
+                </div>
+            </section>
+
+            <section id="lab001">
+                <h2 class="title"> 
+                    Lab Setup 
+                </h2>
+                <div class="section-content">
+                    <ol>
+                        <li>
+                            Pull in CI Migration task  
+                            <pre class="brush: html">
+                                cd ~/workspace/pal-tracker
+								git cherry-pick pipeline-start
+                            </pre>                     <p>
+							This will pull in a .travis.yml file which defines the configuration for Travis CI. </p>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+    
+            <section id="lab002">
+                <h2 class="title"> 
+                   Create an Account
+                </h2>
+                <div class="section-content">
+                    <ol>
+                        <li>
+                           Sign up for a free account with Travis CI and connect it with your GitHub account.
+
+On your account profile page, link your pal-tracker repository to Travis CI by toggling the switch next to the repository name. You may have to click sync account for Travis to pick up the repository.
+                        </li>
+                        
+                    </ol>
+                </div>
+            </section>
+    
+            <section id="lab003">
+                <h2 class="title"> 
+                    Configure application manifest 
+                </h2>
+                <div class="section-content">
+                    <ol>
+                        <li>
+                            To show that we are pushing to a review environment, change the WELCOME_MESSAGE in your manifest.yml to Hello from the review environment.
+
+Use the CF CLI's create-space command to create a space named review where your application will be deployed.
+
+We will also explicitly state routes for our app in our manifest file. We can specify in the route that it is a review environment, rather than using a random route. Routes are global so we will differentiate your route from others in the Cloud Foundry instance by prepending your initials to the host.
+
+Set this route (see routes) for the application in your manifest.
+
+
+                        </li>
+                        
+                        <li>
+                                 <pre class="brush: html">
+           ---
+applications:
+- name: pal-tracker
+  path: build/libs/pal-tracker.jar
+  routes:
+  - route:pal-tracker-travis-deploy-review.cfapps.io
+  env:
+    WELCOME_MESSAGE: Hello from the review environment
+                            </pre>  
+<p>
+						Use the CF CLI's domains command to find the domain name for apps on your Cloud Foundry foundation.
+						</p>							
+                        </li>
+						
+						 <li>
+                           Push your changes to GitHub.
+
+This will trigger a build of your pipeline in Travis CI. Visit the Travis CI site and observe the build. It will fail because your pipeline needs the missing environment variables that are interpolated in your .travis.yml.
+
+
+                        </li>
+                    </ol>
+
+                </div>
+            </section>
+    
+            <section id="lab004">
+                <h2 class="title"> 
+                 Configure your Environment Variables
+                </h2>
+                <div class="section-content">
+                    <ol>
+                        <li>
+                            In the settings section of your Travis CI PAL Tracker page, add environment variables for your CF_API_URL, CF_ORG, CF_USERNAME, CF_PASSWORD, and GITHUB_USERNAME.
+
+Create a GitHub Oauth Token. Configure the token with repo access when you create it. Copy this value and add it to your environment variables with a GITHUB_OAUTH_TOKEN in your pipeline on Travis CI.                   
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="lab005">
+                <h2 class="title"> 
+                 View deployed application
+                </h2>
+                <div class="section-content">
+                    <p>
+                          After the pipeline runs, check the deployed app in your review environment and verify that the welcome message is correct.
+						  </p>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="extras">
+                <h2 class="title"> 
+                    Extras
+                </h2>
+                <div class="section-content">
+                        <p>If you are finished with this assignment before the rest of the class is done, try to configure Travis to deploy to another environment based on certain criteria using conditional builds.</p>                    
+                </div>
+            </section>
+            
+        </div>
+    </div>
+
+
+    <!-- Essential JavaScript Libraries
+	==============================================-->
+    <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="js/jquery.nav.js"></script>
+    <script type="text/javascript" src="syntax-highlighter/scripts/shCore.js"></script>
+    <script type="text/javascript" src="syntax-highlighter/scripts/shBrushXml.js"></script>
+    <script type="text/javascript" src="syntax-highlighter/scripts/shBrushCss.js"></script>
+    <script type="text/javascript" src="syntax-highlighter/scripts/shBrushJScript.js"></script>
+    <script type="text/javascript" src="syntax-highlighter/scripts/shBrushPhp.js"></script>
+    <script type="text/javascript">
+        SyntaxHighlighter.all()
+    </script>
+    <script type="text/javascript" src="js/custom.js"></script>
+
+</body>
+
+</html>

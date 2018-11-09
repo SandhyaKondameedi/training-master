@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8">
+    <title>Education</title>
+    <meta name="description" content="">
+    <!-- Mobile Specific Meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- <link rel="shortcut icon" href="img/favicon.png"> -->
+
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700' rel='stylesheet'>
+
+    <!-- Syntax Highlighter -->
+    <link rel="stylesheet" type="text/css" href="syntax-highlighter/styles/shCore.css" media="all">
+    <link rel="stylesheet" type="text/css" href="syntax-highlighter/styles/shThemeDefault.css" media="all">
+
+    <!-- Font Awesome CSS-->
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <!-- Normalize/Reset CSS-->
+    <link rel="stylesheet" href="css/normalize.min.css">
+    <!-- Main CSS-->
+    <link rel="stylesheet" href="css/main.css">
+
+</head>
+
+<body id="welcome">
+
+    <aside class="left-sidebar">
+        <div class="logo">
+            <a href="#welcome">
+                <img src="img/logo.png" alt="">
+            </a>
+        </div>
+        <nav class="left-nav">
+            <ul id="nav">
+                <li class="current">
+                    <a href="#intro">Session Summary</a>
+                </li>
+                <li>
+                    <a href="#lab001">Getting started with ia service</a>
+                </li>
+                <li>
+                    <a href="#lab002">Getting started with offers service</a>
+                </li>
+                <li>
+                    <a href="#lab003">Feign Integration</a>
+                </li>
+                <li>
+                    <a href="#lab004">Ribbon Integration</a>
+                </li>
+                <li>
+                    <a href="#lab005">Security WorkAround</a>
+                </li>
+                <li>
+                    <a href="#lab006">Eureka Integration</a>
+                </li>
+                <li>
+                    <a href="#lab007">Circuit Breaker Integratio</a>
+                </li>
+                <li>
+                    <a href="#reference">References</a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <div id="main-wrapper">
+        <div class="main-content">
+            <section id="welcome">
+                <div class="content-header">
+                    <h1>Offers Lab</h1>
+                </div>
+                <div class="features">
+                </div>
+            </section>
+
+
+            <section id="intro">
+                <h2 class="title">Session Summary</h2>
+                <div class="section-content">
+                    In this lab ssession , we will be covering the following topics
+                    <ol>
+                        <li>
+                            create two microservices ia and offers. Offers is the consumer of ia
+                        </li>
+                        <li>
+                            Integration with Feign on the offers service
+                        </li>
+                        <li>
+                            Integration with Ribbon on the offers service
+                        </li>
+                        <li>
+                            Integration with Eureka pcf service with offer and ia.
+                        </li>
+                        <li>
+                            Integration with Circuit Breaker pcf service on Offers.
+                        </li>
+                        <li>
+                            Testing end to end integration , and run a load test viz. postman/jmeter
+                        </li>
+
+                    </ol>
+                </div>
+            </section>
+
+            <section id="lab001">
+                <h2 class="title">
+                    Getting started with ia service
+                </h2>
+                <div class="section-content">
+                    <ol>
+                        <li>
+                            From your browser <a href="https://start.spring.io/"> spring starter</a>
+                        </li>
+                        <li>
+                            <p class="fifteen">Fill out the
+                                <strong>Project metadata</strong> fields as follows:</p>
+                            <div class="dlist">
+                                <dl>
+                                    <dt class="hdlist1">Group</dt>
+                                    <dd>
+                                        <p>
+                                            <code>io.uslab</code>
+                                        </p>
+                                    </dd>
+                                    <dt class="hdlist1">Artifact</dt>
+                                    <dd>
+                                        <p>
+                                            <code>ia</code>
+                                        </p>
+                                    </dd>
+                                    <dt class="hdlist1">Name</dt>
+                                    <dd>
+                                        <p>
+                                            <code>ia</code>
+                                        </p>
+                                    </dd>
+                                    <dt class="hdlist1">Description</dt>
+                                    <dd>
+                                        <p>
+                                            <code>ia service</code>
+                                        </p>
+                                    </dd>
+                                    <dt class="hdlist1">Package Name</dt>
+                                    <dd>
+                                        <p>
+                                            <code>io.uslab.ia</code>
+                                        </p>
+                                    </dd>
+                                    <dt class="hdlist1">Type</dt>
+                                    <dd>
+                                        <p>Maven Project</p>
+                                    </dd>
+                                    <dt class="hdlist1">Packaging</dt>
+                                    <dd>
+                                        <p>Jar</p>
+                                    </dd>
+                                    <dt class="hdlist1">Java Version</dt>
+                                    <dd>
+                                        <p>1.8</p>
+                                    </dd>
+									<dt class="hdlist1">Spring Boot</dt>
+									<dd>
+                                        <p>2.0.6</p>
+                                    </dd>
+									
+                                    <dt class="hdlist1">Search for dependencies </dt>
+                                    <dd>
+                                        <p>Actuator,web</p>
+                                    </dd>
+                                    <dt class="hdlist1">Generate Project </dt>
+                                </dl>
+                            </div>
+                        </li>
+                        <li>
+                            create model class in io.uslab.ia.model package
+                            <pre class="brush: html">
+                                    public class IAOfferDetails {
+                                        private String pageId;
+                                        private String description;                                   
+                                        String placementId;
+                                        String offerId;
+                                        String placementUrl;    
+                                        public IAOfferDetails() {
+                                        }                                
+                                        public IAOfferDetails(
+                                            String pageId, String description,
+                                            String placementId,String offerId,
+                                            String placementUrl) {
+                                            super();
+                                            this.pageId = pageId;
+                                            this.description=description;
+                                            this.placementId=placementId;
+                                            this.offerId=offerId;
+                                            this.placementUrl=placementUrl;
+                                        }                                  
+                                        public String getPlacementId() {
+                                            return placementId;
+                                        }                                  
+                                        public String getOfferId() {
+                                            return offerId;
+                                        }
+                                        public String getPlacementUrl() {
+                                            return placementUrl;
+                                        }
+                                        public String getDescription() {
+                                            return description;
+                                        }                                                                       
+                                        public String getPageId() {
+                                            return pageId;
+                                        }
+                                    }
+                            </pre>
+                        </li>
+                        <li>
+                            create a IAController class in io.uslab.ia.controller package
+                            <pre class="brush: html">
+                                    @RestController
+                                    public class IAController {
+                                    
+                                        @GetMapping("/ia/{pageId}/{placementId}")
+                                        public IAOfferDetails retriveIAOfferDetails(
+                                                @PathVariable String pageId,@PathVariable String placementId){
+                                             return new IAOfferDetails(pageId,"result from IA",
+                                                     placementId,"C_ent_overdraftrewind_hpprimary_web",
+                                                     "https://www20.test.com/assets/images/contextual/banner/student-loans/1200x532/wfic412_ph_g-187715263_1200x532.jpg");
+                                        }
+                                    }
+                            </pre>
+                        </li>
+                        <li>
+                            change application.properties to manifest.yml 
+                            <pre class="brush: html">
+ applications:
+  - name: IA
+  path: target/IA-0.0.1-SNAPSHOT.jar
+ 
+                            </pre>
+                        </li>
+                        <li>
+                            run the app hit the localhost endpoints with parameters , test if everything looks ok.
+                        </li>
+
+                    </ol>
+                </div>
+            </section>
+
+            <section id="lab002">
+                <h2 class="title">
+                    Getting started with offers service
+                </h2>
+                <div class="section-content">
+                    <ol>
+                        <li>
+                            From your browser
+                            <a href="https://start.spring.io/">Generate Project</a>
+                        </li>
+                        <li>
+                            <p class="fifteen">Fill out the
+                                <strong>Project metadata</strong> fields as follows:</p>
+                            <div class="dlist">
+                                <dl>
+                                    <dt class="hdlist1">Group</dt>
+                                    <dd>
+                                        <p>
+                                            <code>io.uslab</code>
+                                        </p>
+                                    </dd>
+                                    <dt class="hdlist1">Artifact</dt>
+                                    <dd>
+                                        <p>
+                                            <code>offers</code>
+                                        </p>
+                                    </dd>
+                                    <dt class="hdlist1">Name</dt>
+                                    <dd>
+                                        <p>
+                                            <code>offers</code>
+                                        </p>
+                                    </dd>
+                                    <dt class="hdlist1">Description</dt>
+                                    <dd>
+                                        <p>
+                                            <code>offers service</code>
+                                        </p>
+                                    </dd>
+                                    <dt class="hdlist1">Package Name</dt>
+                                    <dd>
+                                        <p>
+                                            <code>io.uslab.offers</code>
+                                        </p>
+                                    </dd>
+                                    <dt class="hdlist1">Type</dt>
+                                    <dd>
+                                        <p>Maven Project</p>
+                                    </dd>
+                                    <dt class="hdlist1">Packaging</dt>
+                                    <dd>
+                                        <p>Jar</p>
+                                    </dd>
+                                    <dt class="hdlist1">Java Version</dt>
+                                    <dd>
+                                        <p>1.8</p>
+                                    </dd>
+                                    <dt class="hdlist1">Search for dependencies </dt>
+                                    <dd>
+                                        <p>Actuator,web</p>
+                                    </dd>
+                                    <dt class="hdlist1">Generate Project </dt>
+                                </dl>
+                            </div>
+                        </li>
+                        <li>
+                            create model class in io.uslab.offers.model package
+                            <pre class="brush: html">
+                                                public class OfferDetails {
+                                                    String pageId;
+                                                    String description;
+                                                    String placementId;
+                                                    String offerId;
+                                                    String placementUrl;      
+                                                    public OfferDetails() {
+                                                    }                                          
+                                                    public OfferDetails(String pageId, String description,String placementId,String offerId,String placementUrl) {
+                                                        super();
+                                                        this.pageId = pageId;
+                                                        this.description=description;
+                                                        this.placementId=placementId;
+                                                        this.offerId=offerId;
+                                                        this.placementUrl=placementUrl;
+                                                    }
+                                                    public String getPlacementId() {
+                                                        return placementId;
+                                                    }                                                
+                                                    public String getOfferId() {
+                                                        return offerId;
+                                                    }                                                
+                                                    public String getPlacementUrl() {
+                                                        return placementUrl;
+                                                    }                                                                                                                                                
+                                                    public String getPageId() {
+                                                        return pageId;
+                                                    }                                                
+                                                    public String getDescription() {
+                                                        return description;
+                                                    }                                                
+
+                                        </pre>
+                        </li>
+                        <li>
+                            create a OffersController class in io.uslab.offers.controller package , the endpoint will be a local endpoint
+                            <pre class="brush: html">
+                                                    @RestController
+                                                    public class OffersController {                                                                                                                                                               
+                                                        @GetMapping("/offers")
+                                                        public OfferDetails retriveOffer(){
+                                                            Map<String,String> uriVariables = new HashMap();
+                                                            uriVariables.put("pageId","2000");
+                                                            uriVariables.put("placementId","WF_CON_HP_PRIMARY_BNR_1");
+                                                            ResponseEntity<OfferDetails> responseEntity =
+                                                                    new RestTemplate().getForEntity("https://ia-grouchy-numbat.cfapps.io/ia/{pageId}/{placementId}",
+                                                                    OfferDetails.class,
+                                                                    uriVariables);
+                                                            OfferDetails response=responseEntity.getBody();
+                                                            return new OfferDetails(response.getPageId(),response.getDescription(),
+                                                            response.getPlacementId(),response.getOfferId(),response.getPlacementUrl());
+                                                        }
+                                                    }   
+                                            </pre>
+                        </li>
+                        <li>
+                            change application.properties to manifest.yml 
+                            <pre class="brush: html">
+                     applications:
+                      - name: IA
+                      path: target/offers-0.0.1-SNAPSHOT.jar
+  
+                      server:
+                            port: 8084 
+                                                </pre>
+                        </li>
+                        <li>
+                            run the app hit the localhost endpoints  , test if everything looks ok.
+                        </li>
+                        <li>
+                            Test the integration from offers to ia service in local envirnoment
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="lab003">
+                <h2 class="title">
+                    Feign Integration
+                </h2>
+                <div class="section-content">
+                    <ol>
+                        <li>
+                            In the offers pom , add the following dependency
+                            <pre class="brush: html">                                 
+                                            <dependency>
+                                                    <groupId>org.springframework.cloud</groupId>
+                                                    <artifactId>spring-cloud-starter-openfeign</artifactId>
+                                            </dependency>                       
+                                    </pre>
+                        </li>
+                        <li>
+                            enable feign clients in the spring boot application, provide the root package where all your classes resides
+                            <pre class="brush: html"> 
+                                        @SpringBootApplication                                                       
+                                        @EnableFeignClients("io.uslab.offers")
+                                        public class OffersApplication {
+                                        
+                                            public static void main(String[] args) {
+                                        
+                                                SpringApplication.run(OffersApplication.class, args);
+                                            }
+                                        }                  
+                                   </pre>
+                        </li>
+                        <li>
+                            Create a interface IAServiceProxy in the package io.uslab.offers.proxy, url is the end point for local ia service
+                            <pre class="brush: html">                                 
+                                    @FeignClient(name="IA",url="https://ia-grouchy-numbat.cfapps.io")
+                                    public interface IAServiceProxy {
+                                    
+                                        @GetMapping("/ia/{pageId}/{placementId}")
+                                        public OfferDetails retriveOfferDetails
+                                                (@PathVariable("pageId") String pageId,@PathVariable("placementId") String placementId);
+                                    }                      
+                               </pre>
+                        </li>
+
+                        <li>
+                            update the offers controller retriveOffer() to use feign proxy instead of using rest template client
+                            <pre class="brush: html">
+                                    @RestController
+                                    public class OffersController {
+                                        @Autowired
+                                        private IAServiceProxy proxy;
+                                        @GetMapping("/offers")
+                                        public OfferDetails retriveOffer(){
+                                            OfferDetails response = proxy.retriveOfferDetails("123-43-84","WF_CON_HP_PRIMARY_BNR_1");
+                                            return new OfferDetails(response.getPageId(),response.getDescription(),
+                                                    response.getPlacementId(),response.getOfferId(),response.getPlacementUrl());
+                                        }
+                                    }
+                                </pre>
+                        </li>
+                        <li>
+                            build and Run the application , and test if offers is able to call ia using feign
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="lab004">
+                <h2 class="title">
+                    Ribbon Integration
+                </h2>
+                <div class="section-content">
+
+                    <ol>
+                        <li>
+                            Add the following dependency in offers pom
+                            <pre class="brush: html">
+                                    <dependency>
+                                            <groupId>org.springframework.cloud</groupId>
+                                            <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
+                                    </dependency>                               
+                            </pre>
+                        </li>
+                        <li>
+                            Add ribbon client to IAServiceProxy interface
+                            <pre class="brush: html">
+                                    @FeignClient(name="IA")                               
+                                    @RibbonClient(name="IA")
+                                    public interface IAServiceProxy 
+                                        @GetMapping("/ia/{pageId}/{placementId}")
+                                        public OfferDetails retriveOfferDetails
+                                                (@PathVariable("pageId") String pageId,@PathVariable("placementId") String placementId);
+                                                                    
+                            </pre>
+                        </li>
+                        <li>
+                            update offers manifes.yml file to add ribbon, list the IA URL
+                            <pre class="brush: html">
+                                      IA:
+                                        ribbon:
+                                            listOfServers: localhost:8080                         
+                                </pre>
+                        </li>
+
+                        <li>
+                            Build and Run offers and test the integration in local envirnoment
+                        </li>
+
+                    </ol>
+                </div>
+            </section>
+
+            <section id="lab005">
+                <h2 class="title">
+                    Security workaround
+                </h2>
+                <div class="section-content">
+                    <ol>
+                        <li>
+                            Add spring security dependency to offers pom
+                            <pre class="brush: html">
+                                            <dependency>
+                                                    <groupId>org.springframework.boot</groupId>
+                                                    <artifactId>spring-boot-starter-security</artifactId>
+                                            </dependency>                                        
+                                    </pre>
+                        </li>
+                        <li>
+                            Create a class OffersConfiguration in the package io.uslab.offers.Configuration
+                            <pre class="brush: html">
+                                    @Configuration
+                                    @EnableWebSecurity
+                                    public class OffersConfiguration extends WebSecurityConfigurerAdapter {
+                                        @Override
+                                        protected void configure(HttpSecurity http) throws Exception{
+                                            http.authorizeRequests().anyRequest().permitAll();
+                                        }
+                                    }
+                            </pre>
+                        </li>
+                        <li>
+                            Build Run and Test the services in local envirnoment
+                        </li>
+                    </ol>
+                </div>
+            </section>
+            <section id="lab006">
+                <h2 class="title">
+                    Eureka Integration
+                </h2>
+                <div class="section-content">
+                    <ol>
+                        <li>
+                            Add the following dependency in both ia and offers pom
+                            <pre class="brush: html">
+                                    <dependency>
+                                            <groupId>io.pivotal.spring.cloud</groupId>
+                                            <artifactId>spring-cloud-services-starter-service-registry</artifactId>
+                                    </dependency>                             
+                            </pre>
+                        </li>
+                        <li>
+                            Register and discover through eureka in offers spring boot application
+                            <pre class="brush: html">
+
+                                                @SpringBootApplication
+                                                @EnableEurekaClient
+                                                @EnableFeignClients("io.uslab.offers")
+                                                @EnableDiscoveryClient
+                                                public class OffersApplication {
+                                                
+                                                    public static void main(String[] args) {
+                                                
+                                                        SpringApplication.run(OffersApplication.class, args);
+                                                    }
+                                                }
+                                </pre>
+                        </li>
+                        <li>
+                            Update the manifest file , remove ribbon configuration
+                            <pre class="brush: html">
+                                    applications:
+                                    - name: offers
+                                      memory: 1G
+                                      instances: 1
+                                      path: target/offers-0.0.1-SNAPSHOT.jar
+                                      random-route: true
+                                      services:
+                                      - service-registry
+                            </pre>
+                        </li>
+                        <li>
+                            Just Build the offers app , don't run it
+                        </li>
+                        <li>
+                            Register and discover through eureka in ia spring boot application
+                            <pre class="brush: html">
+    
+                                        @SpringBootApplication
+                                        @EnableEurekaClient
+                                        @EnableDiscoveryClient
+                                        public class IaApplication {
+                                        
+                                            public static void main(String[] args) {
+                                                SpringApplication.run(IaApplication.class, args);
+                                            }
+                                        }
+                                    </pre>
+                        </li>
+                        <li>
+                            Update the manifest file , remove ribbon configuration
+                            <pre class="brush: html">
+                                            applications:
+                                            - name: IA
+                                              memory: 1G
+                                              instances: 1
+                                              path: target/IA-0.0.1-SNAPSHOT.jar
+                                              random-route: true
+                                              services:
+                                              - service-registry
+                                    </pre>
+                        </li>
+                        <li>
+                            Build the IA projects
+
+                        </li>
+                        <li>
+                            In the PCF market place create 2 services Don't bind the service . You can also create it through cf command line refer pcf command
+                            line reference.
+                        </li>
+                        <li>
+                            First deploy the ia service if it's succeed then proceed to offers service , deploy using - cf push ia -p target/ia-0.0.1-SNAPSHOT.jar --random-route 
+                            (you also hardcode the route in yml file)
+                        </li>
+                        <li>
+                            Bind the service to IA using command line cf bind-service ia service-registry
+                        </li>
+                        <li>
+                            restart ia service  - cf restart ia
+                        </li>
+                        <li>
+                            if the ia is deployed successfully then go to route and construct ia url endpoint and hit through browser with parameters to see if it works.
+                        </li>
+                        <li>
+                            get the eureka details clicking on manage eureka on ia service in pcf
+                        </li>
+                        <li>
+                            get the eureka url and in the ia service update the manifest.yml of ia
+                        </li>
+                        <li>
+                            manifest.yml of ia, the default zone url is the url of your eureka server (Dont copy url mentioned in the snippet)
+                            <pre class="brush: html">
+                                        applications:
+                                        - name: IA
+                                          memory: 1G
+                                          instances: 1
+                                          path: target/IA-0.0.1-SNAPSHOT.jar
+                                          random-route: true
+                                          services:
+                                          - service-registry
+                                        
+                                        eureka:
+                                          client:
+                                            serviceUrl:
+                                              defaultZone: https://eureka-fc919389-9031-4eb0-8e7f-91bc132aac57.cfapps.io
+
+                                </pre>
+                        </li>
+                        <li>
+                            Again cf push , bind and restart service
+                        </li>
+                        <li>
+                            have the similar steps for offers service for eureka, remove the localhost reference from IAServiceProxy
+
+                        </li>
+                        <li>
+                            offers manifest file
+                            <pre class="brush: html">
+                                    applications:
+                                    - name: offers
+                                      memory: 1G
+                                      instances: 1
+                                      path: target/offers-0.0.1-SNAPSHOT.jar
+                                      random-route: true
+                                      services:
+                                      - service-registry
+                                      
+                                    
+                                    eureka:
+                                      client:
+                                        serviceUrl:
+                                          defaultZone: https://eureka-fc919389-9031-4eb0-8e7f-91bc132aac57.cfapps.io
+                            </pre>
+                        </li>
+                        <li>
+                             offers service -  cf push ia -p target/offers-0.0.1-SNAPSHOT.jar --random-route
+                        </li>
+                        <li>
+                            Bind the service to offers using command line cf bind-service offers service-registry
+                        </li>
+                        <li>
+                            restart offers service - cf restart offers
+                        </li>
+                        <li>
+                            if the offers is deployed successfully then go to route and contruct offers url and hit through browser to see if it works.
+                        </li>
+                        <li>
+                            get the eureka details clicking on manage eureka on offers service in pcf
+                        </li>
+                    </ol>
+                </div>
+            </section>
+            <section id="lab007">
+                <h2 class="title">
+                    Circuit Breaker Integration
+                </h2>
+
+                <div class="section-content">
+                    <ol>
+                        <li>
+                            Add circuit breaker dependency to offers pom
+                            <pre class="brush: html">
+                                            <dependency>
+                                                    <groupId>io.pivotal.spring.cloud</groupId>
+                                                    <artifactId>spring-cloud-services-starter-circuit-breaker</artifactId>
+                                                </dependency>                                        
+                                            </pre>
+                        </li>
+                        <li>
+                            @EnableCircuitBreaker in OffersApplication
+                            <pre class="brush: html">
+                                            @SpringBootApplication
+                                            @EnableEurekaClient
+                                            @EnableCircuitBreaker
+                                            @EnableFeignClients("io.uslab.offers")
+                                            @EnableDiscoveryClient
+                                            public class OffersApplication {
+
+                                                public static void main(String[] args) {
+
+                                                    SpringApplication.run(OffersApplication.class, args);
+                                                }
+                                            }
+                                    </pre>
+                        </li>
+                        <li>
+                                update OffersController
+                                <pre class="brush: html">
+                                        @RestController
+                                        public class OffersController {
+                                        
+                                            @Autowired
+                                            private IAServiceProxy proxy;
+                                        
+                                            @GetMapping("/offers")
+                                            @HystrixCommand(fallbackMethod ="backUpIAMethod")
+                                            public OfferDetails retriveOffer(){
+                                                OfferDetails response = proxy.retriveOfferDetails("123-43-84","WF_CON_HP_PRIMARY_BNR_1");
+                                                return new OfferDetails(response.getPageId(),response.getDescription(),
+                                                        response.getPlacementId(),response.getOfferId(),response.getPlacementUrl());
+                                            }
+                                            public OfferDetails backUpIAMethod(){
+                                        
+                                                return new OfferDetails("1345","response from backup services",
+                                                        "WF_CON_HP_PRIMARY_BNR_1","C_ent_overdraftrewind_hpprimary_web",
+                                                        "https://www20.backup.com/assets/images/contextual/banner/student-loans/1200x532/wfic412_ph_g-187715263_1200x532.jpg");
+                                            }
+                                        }
+                                </pre>
+                        </li>
+                        <li>
+                            update the manifest file of offers with circuit breaker service
+                            <pre class="brush: html">
+                                    applications:
+                                    - name: offers
+                                      memory: 1G
+                                      instances: 1
+                                      path: target/offers-0.0.1-SNAPSHOT.jar
+                                      random-route: true
+                                      services:
+                                      - service-registry
+                                      - circuit-breaker
+                                    
+                                    eureka:
+                                      client:
+                                        serviceUrl:
+                                          defaultZone: https://eureka-fc919389-9031-4eb0-8e7f-91bc132aac57.cfapps.io
+                                    
+                            </pre>
+                        </li>
+                        <li>
+                           Build the service 
+                        </li>
+                        <li>
+                            deploy the service - cf push ia -p target/offers-0.0.1-SNAPSHOT.jar --random-route
+                        </li>
+                        <li>
+                            bind the service - cf bind-service offers circuit-breaker
+                         </li>
+                         <li>
+                                cf restart offers
+                         </li>
+                         <li>
+                                test the offers hitting offers endpoint
+                         </li>
+                         <li>
+                                In PCF navigate to offer's circuit breaker click manage 
+                                and check circuit breaker dash board
+                         </li>
+                         <li>
+                             Install postman and run a negative scenario like for circuit close scenario's
+                         </li>
+                    </ol>
+                </div>
+            </section>
+            <section id="reference">
+                <h2 class="title">
+                   References
+                </h2>
+                <div class="section-content">
+                    <ol>
+                        <li>
+                          The Complete solution can be found here , Fork  
+                          to your git repo or download to your local machine
+                          <a href="https://github.com/sandeepk99/offers"> Offers</a>
+                          and 
+                          <a href="https://github.com/sandeepk99/IA"> IA</a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/Netflix/Hystrix/wiki/How-it-Works">Hystrix How it works</a>
+                            
+                            
+                        </li>
+                        <li>
+                                <a href="https://github.com/Netflix/Hystrix/wiki/Configuration">Hystrix How-to Configuration</a>
+                        </li>
+                        <li>
+                                <a href="https://github.com/Netflix/ribbon/wiki/Getting-Started">Ribbon Getting started</a>
+                                
+                                
+                                
+                        </li>
+                        <li>
+                                <a href="https://github.com/Netflix/ribbon">Netflix Ribbon </a>
+
+                        </li>
+						<li>
+						   <a href="https://cloud.spring.io/spring-cloud-netflix/multi/multi_spring-cloud-ribbon.html">Spring cloud Docs </a>
+						</li>
+						<li>
+						   <a href="https://github.com/OpenFeign/feign">Feign </a>
+						</li>
+						<li>
+						 <a href="https://docs.pivotal.io/spring-cloud-services/2-0/common/circuit-breaker/index.html">PCF v2.0 circuit breaker </a>
+						</li>
+                    </ol>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+
+    <!-- Essential JavaScript Libraries
+	==============================================-->
+    <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="js/jquery.nav.js"></script>
+    <script type="text/javascript" src="syntax-highlighter/scripts/shCore.js"></script>
+    <script type="text/javascript" src="syntax-highlighter/scripts/shBrushXml.js"></script>
+    <script type="text/javascript" src="syntax-highlighter/scripts/shBrushCss.js"></script>
+    <script type="text/javascript" src="syntax-highlighter/scripts/shBrushJScript.js"></script>
+    <script type="text/javascript" src="syntax-highlighter/scripts/shBrushPhp.js"></script>
+    <script type="text/javascript">
+        SyntaxHighlighter.all()
+    </script>
+    <script type="text/javascript" src="js/custom.js"></script>
+
+</body>
+
+</html>

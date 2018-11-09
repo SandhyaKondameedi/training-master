@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8">
+    <title>Education</title>
+    <meta name="description" content="">
+    <!-- Mobile Specific Meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- <link rel="shortcut icon" href="img/favicon.png"> -->
+
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700' rel='stylesheet'>
+
+    <!-- Syntax Highlighter -->
+    <link rel="stylesheet" type="text/css" href="syntax-highlighter/styles/shCore.css" media="all">
+    <link rel="stylesheet" type="text/css" href="syntax-highlighter/styles/shThemeDefault.css" media="all">
+
+    <!-- Font Awesome CSS-->
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <!-- Normalize/Reset CSS-->
+    <link rel="stylesheet" href="css/normalize.min.css">
+    <!-- Main CSS-->
+    <link rel="stylesheet" href="css/main.css">
+
+</head>
+
+<body id="welcome">
+
+    <aside class="left-sidebar">
+        <div class="logo">
+            <a href="#welcome">
+                <img src="img/logo.png" alt="">
+            </a>
+        </div>
+        <nav class="left-nav">
+            <ul id="nav">
+                <li class="current">
+                    <a href="#intro">Session Summary</a>
+                </li>
+                <li>
+                    <a href="#lab001">Lab Setup</a>
+                </li>
+                <li>
+                    <a href="#lab002">Create the Database DDL</a>
+                </li>
+                <li>
+                    <a href="#lab003">Create Migrations</a>
+                </li>
+                <li>
+                    <a href="#lab004">Migrate Local Database</a>
+                </li>
+                <li>
+                    <a href="#lab005">Migrate on PCF</a>
+                </li>
+                <li>
+                    <a href="#extras">Extras</a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <div id="main-wrapper">
+        <div class="main-content">
+            <section id="welcome">
+                <div class="content-header">
+                        <h1>Database Migrations</h1>
+                </div>
+                <div class="features">
+                </div>
+            </section>
+
+            <section id="intro">
+                <h2 class="title">Session Summary</h2>
+                <div class="section-content">
+                    <ol>
+                        <li>
+                                Database migration overview
+                        </li>
+                        <li>
+                                SSH tunnel discussion (your network might block ssh).
+                        </li>
+                        <li>
+                                Flyway CLI (what are alternatives?)
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="lab001">
+                <h2 class="title"> 
+                    Lab Setup 
+                </h2>
+                <div class="section-content">
+                    <ol>
+                        <li>
+                            Pull in CI Migration task  
+                            <pre class="brush: html">
+                                cd ~/workspace/pal-tracker
+                                git cherry-pick migration-start  
+                            </pre>                          </pre>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+    
+            <section id="lab002">
+                <h2 class="title"> 
+                    Create the Database DDL 
+                </h2>
+                <div class="section-content">
+                    <ol>
+                        <li>
+                            Create a folder in the root of your project called databases.
+                        </li>
+                        <li>
+                            Create a folder inside the databases folder called tracker.
+                        </li>
+                        <li>
+                            Create a Database Definition Language (DDL) file called create_databases.sql with the following content:
+                            <pre class="brush: html">
+                                DROP DATABASE IF EXISTS tracker_dev;
+								DROP DATABASE IF EXISTS tracker_test;
+
+								CREATE DATABASE tracker_dev;
+								CREATE DATABASE tracker_test;
+
+								CREATE USER IF NOT EXISTS 'tracker'@'localhost'
+								  IDENTIFIED BY '';
+								GRANT ALL PRIVILEGES ON tracker_dev.* TO 'tracker' @'localhost';
+								GRANT ALL PRIVILEGES ON tracker_test.* TO 'tracker' @'localhost';
+                            </pre>
+                            <p>
+                                    This file will be used to perform the following actions during local development.
+                                    <ul>
+                                        <li>Drop old databases</li>
+                                        <li>Create a development version of the database</li>
+                                        <li>Create a test version of the database</li>
+                                        <li>Create a <code>tracker</code> user in the database that has access to the databases</li>
+                                    </ul>                                     
+                            </p>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+    
+            <section id="lab003">
+                <h2 class="title"> 
+                    Create Migrations  
+                </h2>
+                <div class="section-content">
+                    <ol>
+                        <li>
+                            <p>
+                                Create a file called V1__initial_schema.sql in databases/tracker/migrations/ with the following content:
+                                <pre class="brush: html">
+                                    CREATE TABLE time_entries (
+                                        id         BIGINT(20) NOT NULL AUTO_INCREMENT,
+                                        project_id BIGINT(20),
+                                        user_id    BIGINT(20),
+                                        date       DATE,
+                                        hours      INT,
+                                        
+                                        PRIMARY KEY (id)
+                                        )
+                                        ENGINE = innodb
+                                        DEFAULT CHARSET = utf8;                                    
+                                </pre>
+                            </p>
+                        </li>
+                        <li>
+                            This file holds the instructions to create the time entries table with the following columns:
+                            <ul>
+                                <li><code>id</code> (integer, primary key)</li>
+                                <li><code>project_id</code> (integer)</li>
+                                <li><code>user_id</code> (integer)</li>
+                                <li><code>date</code> (date)<sup>1</sup></li>
+                                <li><code>hours</code> (integer)</li>
+                            </ul>
+                        </li>
+                        <li>
+                                <p>Flyway helps keep track of database versions as a project
+                                        progresses.
+                                        Flyway will automatically run our migrations to the latest version
+                                        assuming that the migration file names follow a certain convention.
+                                        In this case, the convention is <code>V##__</code> where the hashes are
+                                        digits corresponding to the migration's order in the list of
+                                        migrations.
+                                        Beware that those are two underscores.
+                                        Read more about flyway naming conventions <a href="https://flywaydb.org/documentation/migrations#sql-based-migrations" rel="noreferrer noopener">here</a>.</p>                            
+                        </li>
+                    </ol>
+
+                </div>
+            </section>
+    
+            <section id="lab004">
+                <h2 class="title"> 
+                    Migrate local database 
+                </h2>
+                <div class="section-content">
+                    <ol>
+                        <li>
+                            <p>
+                            Run the DDL file from the earlier step with:
+                            </p>
+                            <pre class="brush: html">
+                                mysql -uroot < databases/tracker/create_databases.sql
+                            </pre>
+                            <p>
+                                This creates the development and test versions of the tracker database, but they do not have any tables or columns yet.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Run the migrations on the development database.
+                            </p>
+                            <pre class="brush: html">
+                                flyway -url="jdbc:mysql://localhost:3306/tracker_dev" -locations=filesystem:databases/tracker clean migrate
+                            </pre>
+                            <p>User will be <code>tracker</code> with no password, if you have set up MySQL in
+                                a standard way.
+                                Refer to <a href="https://flywaydb.org/documentation/commandline/" rel="noreferrer noopener">Flyway</a>
+                                for alternative installation instructions.</p>
+                        </li>
+                        <li>
+                            <p>
+                                Do the same on the test database.
+                            </p>
+                            <pre class="brush: html">
+                                flyway -url="jdbc:mysql://localhost:3306/tracker_test" -locations=filesystem:databases/tracker clean migrate
+                            </pre>
+                        </li>
+                        <li>
+                            <p>
+                                Inspect the databases with your favorite MySQL tool and verify that the new time_entries table looks correct. For example:
+                            </p>
+                            <pre class="brush: html">
+                                mysql -u tracker
+                            </pre>
+                            <pre class="brush: html">
+                                    use tracker_dev;
+                                    describe time_entries;                                
+                            </pre>
+                            <pre>
+                                <code class="language-no-highlight">
++------------+--------------+------+-----+---------+----------------+
+| Field      | Type         | Null | Key | Default | Extra          |
++------------+--------------+------+-----+---------+----------------+
+| id         | bigint(20)   | NO   | PRI | NULL    | auto_increment |
+| project_id | bigint(20)   | YES  |     | NULL    |                |
+| user_id    | bigint(20)   | YES  |     | NULL    |                |
+| date       | date         | YES  |     | NULL    |                |
+| hours      | int(11)      | YES  |     | NULL    |                |
++------------+--------------+------+-----+---------+----------------+
+                                </code>
+                            </pre>                            
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="lab005">
+                <h2 class="title"> 
+                    Migrate on PCF 
+                </h2>
+                <div class="section-content">
+                    <p>
+                            You are building a cloud native application which assumes that backing services (like a database) are provided by the platform. Since the Tracker application now needs a database, you must create the database service and bind your application to it. This instructs the platform to reserve the instance of the service and then provide the connection information to your application.
+                    </p>
+                    <ol>
+                        <li>
+                            <p>
+                                Create a MySQL database service instance in the review space on Pivotal Cloud Foundry. You can call this service tracker-database
+                            </p>
+                            <p>
+                                Use the cf marketplace command to find the service and plan name.
+                            </p>
+                            <pre class="brush: html">
+                                    cf target -s review
+                                    cf create-service ${MYSQL_SERVICE_NAME} ${PLAN_NAME} tracker-database
+                            </pre>
+                        </li>
+                        <li>
+                            Bind the service instance to your application.
+                            <pre class="brush: html">
+                                cf target -s review
+                                cf bind-service pal-tracker tracker-database
+                            </pre>
+                            <p>
+                                This instructs Cloud Foundry to provide the connection information for the mysql database you created earlier to your application. This is given to your application as the VCAP_SERVICES environment variable.
+                            </p>
+                        </li>
+                        <li>
+                            <p>Take a look at the updated <code>.travis.yml</code> file</p>
+                            <p>The <code>cherry-pick</code> you performed at the beginning of this lab brought
+                            in changes to your <code>.travis.yml</code> file which run a
+                            <code>migrate-databases.sh</code> script.
+                            This script opens an SSH tunnel to your Cloud Foundry database and
+                            performs migrations.</p>
+                            <p>The database instance that your application has access to is protected
+                            by a firewall so you will not be able to connect to it directly.
+                            Instead, you can open a SSH tunnel which will use your application as a
+                            proxy so that the Flyway CLI running on your CI server can migrate
+                            the database managed by Cloud Foundry.</p>
+                            <p>This functionality does assume you have SSH access on the Cloud Foundry
+                            instance you are working with, which is the case for the foundation we
+                            use for this class.</p>
+                        </li>
+                        <li>
+                            <p>Commit and push your changes.</p>
+                            <p>This will trigger a rebuild and re-deployment to the staging
+                            environment that will also perform the migrations on your CF database.</p>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="extras">
+                <h2 class="title"> 
+                    Extras
+                </h2>
+                <div class="section-content">
+                        <p>Write a few other migrations if you are finished with this assignment
+                                before the rest of the class is done.
+                                Explore some of the other <a href="https://flywaydb.org/documentation/" rel="noreferrer noopener">Flyway commands</a>
+                                and investigate how you can use them to manipulate the database.
+                                Next, try implementing your migrations using a different <a href="https://flywaydb.org/documentation/migrations#versioned-migrations" rel="noreferrer noopener">versioning scheme</a>.</p>                    
+                </div>
+            </section>
+            
+        </div>
+    </div>
+
+
+    <!-- Essential JavaScript Libraries
+	==============================================-->
+    <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="js/jquery.nav.js"></script>
+    <script type="text/javascript" src="syntax-highlighter/scripts/shCore.js"></script>
+    <script type="text/javascript" src="syntax-highlighter/scripts/shBrushXml.js"></script>
+    <script type="text/javascript" src="syntax-highlighter/scripts/shBrushCss.js"></script>
+    <script type="text/javascript" src="syntax-highlighter/scripts/shBrushJScript.js"></script>
+    <script type="text/javascript" src="syntax-highlighter/scripts/shBrushPhp.js"></script>
+    <script type="text/javascript">
+        SyntaxHighlighter.all()
+    </script>
+    <script type="text/javascript" src="js/custom.js"></script>
+
+</body>
+
+</html>
