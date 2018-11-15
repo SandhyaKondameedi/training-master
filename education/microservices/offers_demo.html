@@ -62,7 +62,10 @@
                     <a href="#lab006">Eureka Integration</a>
                 </li>
                 <li>
-                    <a href="#lab007">Circuit Breaker Integratio</a>
+                    <a href="#lab007">Circuit Breaker integration</a>
+                </li>
+                <li>
+                    <a href="#lab008">Zuul API Gateway Integration</a>
                 </li>
                 <li>
                     <a href="#reference">References</a>
@@ -105,7 +108,9 @@
                         <li>
                             Testing end to end integration , and run a load test viz. postman/jmeter
                         </li>
-
+                        <li>
+                            Integrate with Zuul API Gateway
+                        </li>
                     </ol>
                 </div>
             </section>
@@ -166,11 +171,11 @@
                                     <dd>
                                         <p>1.8</p>
                                     </dd>
-									<dt class="hdlist1">Spring Boot</dt>
-									<dd>
+                                    <dt class="hdlist1">Spring Boot</dt>
+                                    <dd>
                                         <p>2.0.6</p>
                                     </dd>
-									
+
                                     <dt class="hdlist1">Search for dependencies </dt>
                                     <dd>
                                         <p>Actuator,web</p>
@@ -236,7 +241,7 @@
                             </pre>
                         </li>
                         <li>
-                            change application.properties to manifest.yml 
+                            change application.properties to manifest.yml
                             <pre class="brush: html">
  applications:
   - name: IA
@@ -355,7 +360,8 @@
                                         </pre>
                         </li>
                         <li>
-                            create a OffersController class in io.uslab.offers.controller package , the endpoint will be a local endpoint
+                            create a OffersController class in io.uslab.offers.controller package , the endpoint will
+                            be a local endpoint
                             <pre class="brush: html">
                                                     @RestController
                                                     public class OffersController {                                                                                                                                                               
@@ -376,7 +382,7 @@
                                             </pre>
                         </li>
                         <li>
-                            change application.properties to manifest.yml 
+                            change application.properties to manifest.yml
                             <pre class="brush: html">
                      applications:
                       - name: IA
@@ -387,7 +393,7 @@
                                                 </pre>
                         </li>
                         <li>
-                            run the app hit the localhost endpoints  , test if everything looks ok.
+                            run the app hit the localhost endpoints , test if everything looks ok.
                         </li>
                         <li>
                             Test the integration from offers to ia service in local envirnoment
@@ -404,7 +410,7 @@
                     <ol>
                         <li>
                             In the offers pom , add the following dependency
-                            <pre class="brush: html">                                 
+                            <pre class="brush: html">
                                             <dependency>
                                                     <groupId>org.springframework.cloud</groupId>
                                                     <artifactId>spring-cloud-starter-openfeign</artifactId>
@@ -412,8 +418,9 @@
                                     </pre>
                         </li>
                         <li>
-                            enable feign clients in the spring boot application, provide the root package where all your classes resides
-                            <pre class="brush: html"> 
+                            enable feign clients in the spring boot application, provide the root package where all
+                            your classes resides
+                            <pre class="brush: html">
                                         @SpringBootApplication                                                       
                                         @EnableFeignClients("io.uslab.offers")
                                         public class OffersApplication {
@@ -426,8 +433,9 @@
                                    </pre>
                         </li>
                         <li>
-                            Create a interface IAServiceProxy in the package io.uslab.offers.proxy, url is the end point for local ia service
-                            <pre class="brush: html">                                 
+                            Create a interface IAServiceProxy in the package io.uslab.offers.proxy, url is the end
+                            point for local ia service
+                            <pre class="brush: html">
                                     @FeignClient(name="IA",url="https://ia-grouchy-numbat.cfapps.io")
                                     public interface IAServiceProxy {
                                     
@@ -439,7 +447,8 @@
                         </li>
 
                         <li>
-                            update the offers controller retriveOffer() to use feign proxy instead of using rest template client
+                            update the offers controller retriveOffer() to use feign proxy instead of using rest
+                            template client
                             <pre class="brush: html">
                                     @RestController
                                     public class OffersController {
@@ -591,7 +600,7 @@
                         <li>
                             Register and discover through eureka in ia spring boot application
                             <pre class="brush: html">
-    
+
                                         @SpringBootApplication
                                         @EnableEurekaClient
                                         @EnableDiscoveryClient
@@ -621,21 +630,24 @@
 
                         </li>
                         <li>
-                            In the PCF market place create 2 services Don't bind the service . You can also create it through cf command line refer pcf command
+                            In the PCF market place create 2 services Don't bind the service . You can also create it
+                            through cf command line refer pcf command
                             line reference.
                         </li>
                         <li>
-                            First deploy the ia service if it's succeed then proceed to offers service , deploy using - cf push ia -p target/ia-0.0.1-SNAPSHOT.jar --random-route 
+                            First deploy the ia service if it's succeed then proceed to offers service , deploy using -
+                            cf push ia -p target/ia-0.0.1-SNAPSHOT.jar --random-route
                             (you also hardcode the route in yml file)
                         </li>
                         <li>
                             Bind the service to IA using command line cf bind-service ia service-registry
                         </li>
                         <li>
-                            restart ia service  - cf restart ia
+                            restart ia service - cf restart ia
                         </li>
                         <li>
-                            if the ia is deployed successfully then go to route and construct ia url endpoint and hit through browser with parameters to see if it works.
+                            if the ia is deployed successfully then go to route and construct ia url endpoint and hit
+                            through browser with parameters to see if it works.
                         </li>
                         <li>
                             get the eureka details clicking on manage eureka on ia service in pcf
@@ -644,7 +656,8 @@
                             get the eureka url and in the ia service update the manifest.yml of ia
                         </li>
                         <li>
-                            manifest.yml of ia, the default zone url is the url of your eureka server (Dont copy url mentioned in the snippet)
+                            manifest.yml of ia, the default zone url is the url of your eureka server (Dont copy url
+                            mentioned in the snippet)
                             <pre class="brush: html">
                                         applications:
                                         - name: IA
@@ -666,7 +679,8 @@
                             Again cf push , bind and restart service
                         </li>
                         <li>
-                            have the similar steps for offers service for eureka, remove the localhost reference from IAServiceProxy
+                            have the similar steps for offers service for eureka, remove the localhost reference from
+                            IAServiceProxy
 
                         </li>
                         <li>
@@ -689,7 +703,7 @@
                             </pre>
                         </li>
                         <li>
-                             offers service -  cf push ia -p target/offers-0.0.1-SNAPSHOT.jar --random-route
+                            offers service - cf push ia -p target/offers-0.0.1-SNAPSHOT.jar --random-route
                         </li>
                         <li>
                             Bind the service to offers using command line cf bind-service offers service-registry
@@ -698,7 +712,8 @@
                             restart offers service - cf restart offers
                         </li>
                         <li>
-                            if the offers is deployed successfully then go to route and contruct offers url and hit through browser to see if it works.
+                            if the offers is deployed successfully then go to route and contruct offers url and hit
+                            through browser to see if it works.
                         </li>
                         <li>
                             get the eureka details clicking on manage eureka on offers service in pcf
@@ -740,8 +755,8 @@
                                     </pre>
                         </li>
                         <li>
-                                update OffersController
-                                <pre class="brush: html">
+                            update OffersController
+                            <pre class="brush: html">
                                         @RestController
                                         public class OffersController {
                                         
@@ -785,70 +800,303 @@
                             </pre>
                         </li>
                         <li>
-                           Build the service 
+                            Build the service
                         </li>
                         <li>
                             deploy the service - cf push ia -p target/offers-0.0.1-SNAPSHOT.jar --random-route
                         </li>
                         <li>
                             bind the service - cf bind-service offers circuit-breaker
-                         </li>
-                         <li>
-                                cf restart offers
-                         </li>
-                         <li>
-                                test the offers hitting offers endpoint
-                         </li>
-                         <li>
-                                In PCF navigate to offer's circuit breaker click manage 
-                                and check circuit breaker dash board
-                         </li>
-                         <li>
-                             Install postman and run a negative scenario like for circuit close scenario's
-                         </li>
+                        </li>
+                        <li>
+                            cf restart offers
+                        </li>
+                        <li>
+                            test the offers hitting offers endpoint
+                        </li>
+                        <li>
+                            In PCF navigate to offer's circuit breaker click manage
+                            and check circuit breaker dash board
+                        </li>
+                        <li>
+                            Install postman and run a negative scenario like for circuit close scenario's
+                        </li>
+                    </ol>
+                </div>
+            </section>
+            <section id="lab008">
+                <h2 class="title">
+                    Getting started with edgeservice
+                </h2>
+                <div class="section-content">
+                    <ol>
+                        <li>
+                            From your browser
+                            <a href="https://start.spring.io/">Generate Project</a>
+                        </li>
+                        <li>
+                            <p class="fifteen">Fill out the
+                                <strong>Project metadata</strong> fields as follows:</p>
+                            <div class="dlist">
+                                <dl>
+                                    <dt class="hdlist1">Group</dt>
+                                    <dd>
+                                        <p>
+                                            <code>io.uslab</code>
+                                        </p>
+                                    </dd>
+                                    <dt class="hdlist1">Artifact</dt>
+                                    <dd>
+                                        <p>
+                                            <code>edgeservice</code>
+                                        </p>
+                                    </dd>
+                                    <dt class="hdlist1">Name</dt>
+                                    <dd>
+                                        <p>
+                                            <code>edgeservice</code>
+                                        </p>
+                                    </dd>
+                                    <dt class="hdlist1">Description</dt>
+                                    <dd>
+                                        <p>
+                                            <code>edgeservice</code>
+                                        </p>
+                                    </dd>
+                                    <dt class="hdlist1">Package Name</dt>
+                                    <dd>
+                                        <p>
+                                            <code>io.uslab.edgeservice</code>
+                                        </p>
+                                    </dd>
+                                    <dt class="hdlist1">Type</dt>
+                                    <dd>
+                                        <p>Maven Project</p>
+                                    </dd>
+                                    <dt class="hdlist1">Packaging</dt>
+                                    <dd>
+                                        <p>Jar</p>
+                                    </dd>
+                                    <dt class="hdlist1">Java Version</dt>
+                                    <dd>
+                                        <p>1.8</p>
+                                    </dd>
+                                    <dt class="hdlist1">Search for dependencies </dt>
+                                    <dd>
+                                        <p>Actuator,web,Zuul</p>
+                                    </dd>
+                                    <dt class="hdlist1">Generate Project </dt>
+                                </dl>
+                            </div>
+                        </li>
+                        <li>
+                            Add Security and service registry dependency
+                            <pre class="brush: html">
+                                <dependency>
+                                    <groupId>io.pivotal.spring.cloud</groupId>
+                                    <artifactId>spring-cloud-services-starter-service-registry</artifactId>
+                                </dependency>
+                                <dependency>
+                                    <groupId>org.springframework.boot</groupId>
+                                    <artifactId>spring-boot-starter-security</artifactId>
+                                </dependency>                                       
+                                            </pre>
+                        </li>
+                        <li>
+                            create ZuulPreFilter class in io.uslab.edgeservice.filter package
+                            <pre class="brush: html">
+                                package io.uslab.edgeservice.filter;
+
+                                import com.netflix.zuul.context.RequestContext;
+                                import com.netflix.zuul.exception.ZuulException;
+                                import org.slf4j.Logger;
+                                import org.slf4j.LoggerFactory;
+                                
+                                import javax.servlet.http.HttpServletRequest;
+                                
+                                public class ZuulPreFilter extends com.netflix.zuul.ZuulFilter {
+                                
+                                    Logger logger = LoggerFactory.getLogger(ZuulPreFilter.class);
+                                
+                                    @Override
+                                    public String filterType() {
+                                        return "pre";
+                                    }
+                                
+                                    @Override
+                                    public int filterOrder() {
+                                        return 1;
+                                    }
+                                
+                                    @Override
+                                    public boolean shouldFilter() {
+                                       return true;
+                                
+                                    }
+                                
+                                    @Override
+                                    public Object run() throws ZuulException {
+                                        RequestContext ctx = RequestContext.getCurrentContext();
+                                        HttpServletRequest request = ctx.getRequest();
+                                        logger.info("The context path test --> "+ request.getContextPath());
+                                        System.out.println("Sandeep Request Method : " + request.getMethod() + " Request URL : " + request.getRequestURL().toString());
+                                        if (request.getParameter("sample") != null) {
+                                            // put the serviceId in `RequestContext`
+                                            ctx.put("SERVICE_ID_KEY", request.getParameter("XYZ-13579-999"));
+                                        }
+                                        /*
+                                        HttpServletRequest request = RequestContext.getCurrentContext()
+                                                .getRequest();
+                                        logger.info("The context path test --> "+ request.getContextPath());*
+                                
+                                        */return null;
+                                    }
+                                }
+                                                                               
+
+                                        </pre>
+                        </li>
+                        <li>
+                            create a EdgeSecurityConfig class in package io.uslab.edgeservice.config ,
+                            <pre class="brush: html">
+                                package io.uslab.edgeservice.config;
+
+                                import org.springframework.context.annotation.Configuration;
+                                import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+                                import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+                                import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+                                
+                                @Configuration
+                                @EnableWebSecurity
+                                public class EdgeSecurityConfig extends WebSecurityConfigurerAdapter {
+                                
+                                    @Override
+                                    protected void configure(HttpSecurity http) throws Exception{
+                                        http.authorizeRequests().anyRequest().permitAll();
+                                    }
+                                } 
+                                            </pre>
+                        </li>
+                        <li>
+                            In the spring boot application class enablezuulproxy & EnableDiscoveryClient
+                            <pre class="brush: html">
+                                package io.uslab.edgeservice;
+
+                                import io.uslab.edgeservice.filter.ZuulPreFilter;
+                                import org.springframework.boot.SpringApplication;
+                                import org.springframework.boot.autoconfigure.SpringBootApplication;
+                                import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+                                import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
+                                import org.springframework.context.annotation.Bean;
+                                
+                                @SpringBootApplication
+                                @EnableDiscoveryClient
+                                @EnableZuulProxy
+                                public class EdgeserviceApplication {
+                                
+                                    public static void main(String[] args) {
+                                        SpringApplication.run(EdgeserviceApplication.class, args);
+                                    }
+                                
+                                    @Bean
+                                    public ZuulPreFilter preFilter() {
+                                        return new ZuulPreFilter();
+                                    }
+                                }
+                                            </pre>
+                        </li>
+                        <li>
+                            change application.properties to manifest.yml
+                            <pre class="brush: html">
+                                applications:
+                                - name: edgeservice
+                                  instances: 1
+                                  path: target/edgeservice-0.0.1-SNAPSHOT.jar
+                                
+                                eureka:
+                                  client:
+                                    registerWithEureka: true
+                                    fetchRegistry: true
+                                    serviceUrl:
+                                      defaultZone: https://eureka-f9e5c87f-099c-4923-ad3f-6e732286f0a1.cfapps.io
+                                                </pre>
+                        </li>
+                        <li>
+                            run mvn clean install.
+                        </li>
+                        <li>
+                            cf push edgeservice -p target/edgeservice-0.0.1-SNAPSHOT.jar
+                        </li>
+                        <li>
+                            cf bind-service edgeservice service-registry
+                        </li>
+                        <li>
+                            cf restage edgeservice
+                        </li>
+                        <li>
+                            Once the Edge Service is up and running , take the route hit <route_url>/offers/offers
+                        </li>
                     </ol>
                 </div>
             </section>
             <section id="reference">
                 <h2 class="title">
-                   References
+                    References
                 </h2>
                 <div class="section-content">
                     <ol>
                         <li>
-                          The Complete solution can be found here , Fork  
-                          to your git repo or download to your local machine
-                          <a href="https://github.com/sandeepk99/offers"> Offers</a>
-                          and 
-                          <a href="https://github.com/sandeepk99/IA"> IA</a>
+                            The Complete solution can be found here , Fork
+                            to your git repo or download to your local machine
+                            <a href="https://github.com/sandeepk99/offers"> Offers</a> ,
+
+                            <a href="https://github.com/sandeepk99/IA"> IA</a> and
+
+                            <a href="https://github.com/sandeepk99/edgeservice"> edgeservice</a>
                         </li>
                         <li>
                             <a href="https://github.com/Netflix/Hystrix/wiki/How-it-Works">Hystrix How it works</a>
-                            
-                            
-                        </li>
-                        <li>
-                                <a href="https://github.com/Netflix/Hystrix/wiki/Configuration">Hystrix How-to Configuration</a>
-                        </li>
-                        <li>
-                                <a href="https://github.com/Netflix/ribbon/wiki/Getting-Started">Ribbon Getting started</a>
-                                
-                                
-                                
-                        </li>
-                        <li>
-                                <a href="https://github.com/Netflix/ribbon">Netflix Ribbon </a>
+
 
                         </li>
-						<li>
-						   <a href="https://cloud.spring.io/spring-cloud-netflix/multi/multi_spring-cloud-ribbon.html">Spring cloud Docs </a>
-						</li>
-						<li>
-						   <a href="https://github.com/OpenFeign/feign">Feign </a>
-						</li>
-						<li>
-						 <a href="https://docs.pivotal.io/spring-cloud-services/2-0/common/circuit-breaker/index.html">PCF v2.0 circuit breaker </a>
-						</li>
+                        <li>
+                            <a href="https://github.com/Netflix/Hystrix/wiki/Configuration">Hystrix How-to
+                                Configuration</a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/Netflix/ribbon/wiki/Getting-Started">Ribbon Getting started</a>
+
+
+
+                        </li>
+                        <li>
+                            <a href="https://cloud.spring.io/spring-cloud-netflix/multi/multi__router_and_filter_zuul.html">Zuul</a>
+
+
+
+                        </li>
+                        <li>
+                            <a href=" https://spring.io/guides/gs/routing-and-filtering/">Zuul Filter</a>
+
+
+
+                        </li>
+
+                        <li>
+                            <a href="https://github.com/Netflix/ribbon">Netflix Ribbon </a>
+
+                        </li>
+                        <li>
+                            <a href="https://cloud.spring.io/spring-cloud-netflix/multi/multi_spring-cloud-ribbon.html">Spring
+                                cloud Docs </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/OpenFeign/feign">Feign </a>
+                        </li>
+                        <li>
+                            <a href="https://docs.pivotal.io/spring-cloud-services/2-0/common/circuit-breaker/index.html">PCF
+                                v2.0 circuit breaker </a>
+                        </li>
                     </ol>
                 </div>
             </section>
